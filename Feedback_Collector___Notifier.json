@@ -1,0 +1,212 @@
+{
+  "name": "Feedback Collector & Notifier",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "feedback-collector",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "66543cf3-d749-47f1-97fd-5825a503feb0",
+      "name": "Webhook",
+      "webhookId": "e48310df-d3e0-46af-90c4-5c327e9fab18"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c2773aa8-46c0-49c1-a9e7-8b435da24cf3",
+              "name": "name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "9a988f62-5ad9-4cdb-b7b1-a77c19370b13",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "862a340b-da84-4d8a-b9bf-41339340f9dd",
+              "name": "message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "fb59862b-2635-4fcd-a866-898af672510b",
+              "name": "submittedAt",
+              "value": "={{ new Date().toISOString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "id": "2032fe5d-9265-42ad-8521-8a4bf473a732",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1G5OgrZ4gsjEFCnCT4H5h0GneONJup4jEND8zsViGm5A",
+          "mode": "list",
+          "cachedResultName": "FeedbackLog",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G5OgrZ4gsjEFCnCT4H5h0GneONJup4jEND8zsViGm5A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1G5OgrZ4gsjEFCnCT4H5h0GneONJup4jEND8zsViGm5A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.name }}",
+            "Email": "={{ $json.email }}",
+            "Message": "={{ $json.message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        0
+      ],
+      "id": "a1d8b308-1d5a-4af9-8fa2-064dab71985e",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CA6H4EJZRRt4e1QA",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "ashleymathias100@gmail.com ",
+        "subject": "=New Feedback from {{ $json.Name }}",
+        "message": "=📬 New feedback received!  Name:{{ $json.Name }}  Email:{{ $json.Email }}  Message: {{ $json.Message }}  Submitted At:{{ $('Edit Fields').item.json.submittedAt }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        0
+      ],
+      "id": "c1280a92-51dd-4c3f-bd03-fce50f1d6216",
+      "name": "Gmail",
+      "webhookId": "867cc4ce-d1fa-4611-9f4e-98ef00643399",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "e16qN6o9TJ0ypUkP",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2a9a37a1-0237-414e-82b7-7dc739531ec3",
+  "meta": {
+    "instanceId": "8165fdb40026658032009a0d1fa4414c8a803bca194bfbf9c9bd83390f574456"
+  },
+  "id": "Kg6O6XyI0C5quHRG",
+  "tags": [
+    {
+      "createdAt": "2025-05-22T11:09:34.314Z",
+      "updatedAt": "2025-05-22T11:09:34.314Z",
+      "id": "bbpcyGOyFwnrdBF2",
+      "name": "N8N-Practice"
+    }
+  ]
+}
